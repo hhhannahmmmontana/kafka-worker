@@ -1,0 +1,24 @@
+CREATE TABLE tasks
+(
+    id           UUID PRIMARY KEY,
+    event_id     UUID         NOT NULL UNIQUE,
+    name         VARCHAR(255) NOT NULL,
+    duration     BIGINT       NOT NULL CHECK (duration > 0),
+    status       VARCHAR(32)  NOT NULL DEFAULT 'NEW'
+        CHECK (status IN ('NEW', 'IN_PROGRESS', 'COMPLETED', 'FAILED')),
+    progress     INTEGER      NOT NULL DEFAULT 0
+        CHECK (progress BETWEEN 0 AND 100),
+    result       TEXT,
+    execution_id UUID,
+    created_at   TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    started_at   TIMESTAMPTZ,
+    finished_at  TIMESTAMPTZ,
+    version      BIGINT       NOT NULL DEFAULT 0,
+    CONSTRAINT tasks_running_state CHECK (
+        status <> 'IN_PROGRESS'
+            OR (execution_id IS NOT NULL AND started_at IS NOT NULL)
+        ),
+    CONSTRAINT tasks_finished_state CHECK (
+        status NOT IN ('COMPLETED', 'FAILED') OR finished_at IS NOT NULL
+        )
+);
