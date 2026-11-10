@@ -8,8 +8,8 @@ import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.serialization.ByteArraySerializer;
 import org.apache.kafka.common.serialization.Serializer;
-import org.apache.kafka.common.serialization.StringDeserializer;
-import org.apache.kafka.common.serialization.StringSerializer;
+import org.apache.kafka.common.serialization.UUIDDeserializer;
+import org.apache.kafka.common.serialization.UUIDSerializer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,6 +27,7 @@ import org.springframework.util.backoff.FixedBackOff;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 @Configuration
 @EnableKafka
@@ -35,7 +36,7 @@ public class KafkaConfig {
     @Value("${spring.kafka.bootstrap-servers}")
     private String bootstrapServers;
 
-    @Value("${spring.kafka.consumer.group-id:task-group}")
+    @Value("${spring.kafka.consumer.group-id}")
     private String groupId;
 
     @Value("${kafka.listener.concurrency:}")
@@ -48,7 +49,7 @@ public class KafkaConfig {
     private int errorMaxRetries;
 
     @Bean
-    public ConsumerFactory<String, TaskRequest> consumerFactory() {
+    public ConsumerFactory<UUID, TaskRequest> consumerFactory() {
         Map<String, Object> props = new HashMap<>();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         props.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
@@ -57,13 +58,13 @@ public class KafkaConfig {
         var jsonDeserializer = new JacksonJsonDeserializer<>(TaskRequest.class, false);
         return new DefaultKafkaConsumerFactory<>(
             props,
-            new StringDeserializer(),
+            new UUIDDeserializer(),
             new ErrorHandlingDeserializer<>(jsonDeserializer)
         );
     }
 
     @Bean
-    public ProducerFactory<String, Object> dltProducerFactory() {
+    public ProducerFactory<UUID, Object> dltProducerFactory() {
         Map<String, Object> props = new HashMap<>();
         props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         props.put(ProducerConfig.ACKS_CONFIG, "all");
@@ -75,21 +76,21 @@ public class KafkaConfig {
 
         return new DefaultKafkaProducerFactory<>(
             props,
-            new StringSerializer(),
+            new UUIDSerializer(),
             new DelegatingByTypeSerializer(serializers)
         );
     }
 
     @Bean
-    public KafkaTemplate<String, Object> dltKafkaTemplate(
-        ProducerFactory<String, Object> dltProducerFactory
+    public KafkaTemplate<UUID, Object> dltKafkaTemplate(
+        ProducerFactory<UUID, Object> dltProducerFactory
     ) {
         return new KafkaTemplate<>(dltProducerFactory);
     }
 
     @Bean
     public DefaultErrorHandler kafkaErrorHandler(
-        KafkaTemplate<String, Object> dltKafkaTemplate
+        KafkaTemplate<UUID, Object> dltKafkaTemplate
     ) {
         DeadLetterPublishingRecoverer recoverer =
             new DeadLetterPublishingRecoverer(
@@ -111,16 +112,16 @@ public class KafkaConfig {
     }
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, TaskRequest>
+    public ConcurrentKafkaListenerContainerFactory<UUID, TaskRequest>
     kafkaListenerContainerFactory(
-        ConsumerFactory<String, TaskRequest> consumerFactory,
+        ConsumerFactory<UUID, TaskRequest> consumerFactory,
         DefaultErrorHandler kafkaErrorHandler
     ) {
         if (concurrency < 1) {
             throw new IllegalArgumentException("Kafka concurrency value must be positive value");
         }
 
-        var factory = new ConcurrentKafkaListenerContainerFactory<String, TaskRequest>();
+        var factory = new ConcurrentKafkaListenerContainerFactory<UUID, TaskRequest>();
         factory.setConsumerFactory(consumerFactory);
         factory.setConcurrency(concurrency);
         factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.RECORD);
