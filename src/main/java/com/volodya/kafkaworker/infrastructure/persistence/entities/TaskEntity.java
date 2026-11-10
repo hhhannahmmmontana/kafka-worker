@@ -29,8 +29,7 @@ public class TaskEntity {
     private String name;
 
     @Column(nullable = false)
-    @Setter(AccessLevel.PUBLIC)
-    private Long duration = 0L;
+    private Long duration;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
@@ -63,12 +62,4 @@ public class TaskEntity {
     @Version
     @Column(nullable = false)
     private Long version;
-
-    public TaskEntity(
-        UUID eventId,
-        String name
-    ) {
-        this.eventId = eventId;
-        this.name = name;
-    }
 }
