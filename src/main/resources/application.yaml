@@ -1,2 +1,6 @@
 spring:
   application.name: kafka-worker
+
+application.kafka.error-handling:
+  backoff-ms: 1000
+  max-retries: 2
