@@ -1,4 +1,4 @@
-package com.volodya.kafkaworker.domain.entites.enums;
+package com.volodya.kafkaworker.infrastructure.persistence.entities.enums;
 
 public enum TaskStatus {
     NEW,
