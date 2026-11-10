@@ -1,7 +1,7 @@
-package com.volodya.kafkaworker.infrastructure.persistence.repositories;
+package com.volodya.kafkaworker.persistence.repositories;
 
-import com.volodya.kafkaworker.infrastructure.persistence.entities.TaskEntity;
-import com.volodya.kafkaworker.infrastructure.persistence.entities.enums.TaskStatus;
+import com.volodya.kafkaworker.persistence.entities.TaskEntity;
+import com.volodya.kafkaworker.persistence.entities.enums.TaskStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

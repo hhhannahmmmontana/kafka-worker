@@ -1,7 +1,7 @@
-package com.volodya.kafkaworker.infrastructure.consuming.configuration;
+package com.volodya.kafkaworker.brokers.configuration;
 
 import com.volodya.kafkaworker.application.exceptions.InvalidTaskMessageException;
-import com.volodya.kafkaworker.infrastructure.consuming.dto.requests.TaskRequest;
+import com.volodya.kafkaworker.brokers.dto.requests.TaskRequest;
 import jakarta.validation.ConstraintViolationException;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;

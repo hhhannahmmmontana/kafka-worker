@@ -1,6 +1,6 @@
-package com.volodya.kafkaworker.infrastructure.persistence.entities;
+package com.volodya.kafkaworker.persistence.entities;
 
-import com.volodya.kafkaworker.infrastructure.persistence.entities.enums.TaskStatus;
+import com.volodya.kafkaworker.persistence.entities.enums.TaskStatus;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;

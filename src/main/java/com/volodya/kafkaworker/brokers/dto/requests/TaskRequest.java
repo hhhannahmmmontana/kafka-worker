@@ -1,4 +1,4 @@
-package com.volodya.kafkaworker.infrastructure.consuming.dto.requests;
+package com.volodya.kafkaworker.brokers.dto.requests;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

@@ -1,8 +1,8 @@
-package com.volodya.kafkaworker.infrastructure.consuming;
+package com.volodya.kafkaworker.brokers;
 
 import com.volodya.kafkaworker.application.exceptions.InvalidTaskMessageException;
 import com.volodya.kafkaworker.application.services.TaskRegistrationService;
-import com.volodya.kafkaworker.infrastructure.consuming.dto.requests.TaskRequest;
+import com.volodya.kafkaworker.brokers.dto.requests.TaskRequest;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Validator;

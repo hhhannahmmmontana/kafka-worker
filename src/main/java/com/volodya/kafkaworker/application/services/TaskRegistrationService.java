@@ -1,9 +1,9 @@
 package com.volodya.kafkaworker.application.services;
 
 import com.volodya.kafkaworker.application.exceptions.InvalidTaskMessageException;
-import com.volodya.kafkaworker.infrastructure.consuming.dto.requests.TaskRequest;
-import com.volodya.kafkaworker.infrastructure.persistence.entities.TaskEntity;
-import com.volodya.kafkaworker.infrastructure.persistence.repositories.TaskRepository;
+import com.volodya.kafkaworker.brokers.dto.requests.TaskRequest;
+import com.volodya.kafkaworker.persistence.entities.TaskEntity;
+import com.volodya.kafkaworker.persistence.repositories.TaskRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,7 +23,7 @@ public class TaskRegistrationService {
             request.duration()
         );
 
-        if (inserted == 0) {
+        if (inserted == 0) { // idk why we would even need this...
             TaskEntity existing = taskRepository.findByEventId(request.eventId())
                 .orElseThrow(() -> new IllegalStateException(
                     "No record with event id " + request.eventId() + " is present"
