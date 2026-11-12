@@ -3,7 +3,7 @@ package com.volodya.kafkaworker.application.services;
 import com.volodya.kafkaworker.application.exceptions.InvalidTaskMessageException;
 import com.volodya.kafkaworker.brokers.dto.requests.TaskRequest;
 import com.volodya.kafkaworker.persistence.entities.TaskEntity;
-import com.volodya.kafkaworker.persistence.repositories.TaskRepository;
+import com.volodya.kafkaworker.persistence.repositories.TaskEntityJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class TaskRegistrationService {
 
-    private final TaskRepository taskRepository;
+    private final TaskEntityJpaRepository taskRepository;
 
     @Transactional
     public void register(TaskRequest request) {

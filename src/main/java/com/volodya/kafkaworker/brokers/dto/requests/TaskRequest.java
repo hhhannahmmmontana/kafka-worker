@@ -15,7 +15,6 @@ public record TaskRequest(
     @Size(max = 255)
     String name,
 
-    @NotNull
     @Positive
-    Long duration
+    long duration
 ) {}

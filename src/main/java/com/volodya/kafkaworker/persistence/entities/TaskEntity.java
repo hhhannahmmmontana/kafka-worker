@@ -58,8 +58,4 @@ public class TaskEntity {
     @Column(name = "finished_at")
     @Setter(AccessLevel.PUBLIC)
     private @Nullable Instant finishedAt;
-
-    @Version
-    @Column(nullable = false)
-    private Long version;
 }

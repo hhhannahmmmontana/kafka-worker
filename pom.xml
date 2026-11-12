@@ -18,6 +18,7 @@
 
     <properties>
         <maven.compiler.release>25</maven.compiler.release>
+        <spring.retry.version>2.0.13</spring.retry.version>
         <profile.active/>
     </properties>
 
@@ -45,6 +46,11 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.retry</groupId>
+            <artifactId>spring-retry</artifactId>
+            <version>${spring.retry.version}</version>
         </dependency>
 
         <dependency>

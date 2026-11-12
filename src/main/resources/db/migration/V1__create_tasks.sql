@@ -13,7 +13,7 @@ CREATE TABLE tasks
     created_at   TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP,
     started_at   TIMESTAMPTZ,
     finished_at  TIMESTAMPTZ,
-    version      BIGINT       NOT NULL DEFAULT 0,
+    version      BIGINT       NOT NULL,
     CONSTRAINT tasks_running_state CHECK (
         status <> 'IN_PROGRESS'
             OR (execution_id IS NOT NULL AND started_at IS NOT NULL)
@@ -22,3 +22,6 @@ CREATE TABLE tasks
         status NOT IN ('COMPLETED', 'FAILED') OR finished_at IS NOT NULL
         )
 );
+
+CREATE INDEX idx_tasks_status ON tasks (status);
+CREATE INDEX idx_tasks_created_at ON tasks (created_at);
