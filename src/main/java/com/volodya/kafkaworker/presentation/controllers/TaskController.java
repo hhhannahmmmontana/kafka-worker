@@ -2,6 +2,7 @@ package com.volodya.kafkaworker.presentation.controllers;
 
 import com.volodya.kafkaworker.application.entites.dto.TaskDto;
 import com.volodya.kafkaworker.application.services.TaskQueryService;
+import com.volodya.kafkaworker.application.services.TaskRetryService;
 import com.volodya.kafkaworker.presentation.responses.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -13,10 +14,7 @@ import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/tasks")
@@ -26,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class TaskController {
 
     private final TaskQueryService taskQueryService;
+    private final TaskRetryService taskRetryService;
 
     @GetMapping("/{id}")
     @Operation(summary = "Получить статус и результат задачи")
@@ -50,5 +49,32 @@ public class TaskController {
         @PathVariable("id") @Positive Long id
     ) {
         return ResponseEntity.ok(taskQueryService.getTaskById(id));
+    }
+
+    @PostMapping("/{id}/retry")
+    @Operation(summary = "Перезапустить failed-задачу")
+    @ApiResponses({
+        @ApiResponse(responseCode = "202", description = "Задача перезапущена"),
+        @ApiResponse(responseCode = "400", description = "Некорректный идентификатор",
+            content = @Content(mediaType = "application/json",
+                schema = @Schema(implementation = ErrorResponse.class))),
+        @ApiResponse(responseCode = "400", description = "Неверный статус задачи",
+            content = @Content(mediaType = "application/json",
+                schema = @Schema(implementation = ErrorResponse.class))),
+        @ApiResponse(responseCode = "404", description = "Задача не найдена",
+            content = @Content(mediaType = "application/json",
+                schema = @Schema(implementation = ErrorResponse.class))),
+        @ApiResponse(responseCode = "503", description = "База данных недоступна",
+            content = @Content(mediaType = "application/json",
+                schema = @Schema(implementation = ErrorResponse.class))),
+        @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервиса",
+            content = @Content(mediaType = "application/json",
+                schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    public ResponseEntity<Void> retryTask(
+        @PathVariable("id") @Positive Long id
+    ) {
+        taskRetryService.retryFailedTask(id);
+        return ResponseEntity.accepted().build();
     }
 }

@@ -1,0 +1,5 @@
+ALTER TABLE tasks
+    ADD COLUMN attempts      INT NOT NULL DEFAULT 0,
+    ADD COLUMN max_attempts  INT NOT NULL DEFAULT 3,
+    ADD COLUMN lease_until   TIMESTAMPTZ,
+    ADD COLUMN next_retry_at TIMESTAMPTZ;

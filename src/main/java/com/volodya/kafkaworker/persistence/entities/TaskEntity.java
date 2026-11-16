@@ -22,7 +22,7 @@ public class TaskEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "event_id", nullable = false, unique = true)
+    @Column(name = "event_id", nullable = false, updatable = false, unique = true)
     private UUID eventId;
 
     @Column(nullable = false)
@@ -58,6 +58,22 @@ public class TaskEntity {
     @Column(name = "finished_at")
     @Setter(AccessLevel.PUBLIC)
     private @Nullable Instant finishedAt;
+
+    @Column(nullable = false)
+    @Setter(AccessLevel.PUBLIC)
+    private Integer attempts = 0;
+
+    @Column(name = "max_attempts", nullable = false)
+    @Setter(AccessLevel.PUBLIC)
+    private Integer maxAttempts;
+
+    @Column(name = "lease_until")
+    @Setter(AccessLevel.PUBLIC)
+    private Instant leaseUntil;
+
+    @Column(name = "next_retry_at")
+    @Setter(AccessLevel.PUBLIC)
+    private Instant nextRetryAt;
 
     @Column(name = "version")
     @Version

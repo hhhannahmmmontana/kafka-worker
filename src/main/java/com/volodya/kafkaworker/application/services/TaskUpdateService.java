@@ -5,6 +5,7 @@ import com.volodya.kafkaworker.persistence.entities.enums.TaskStatus;
 import com.volodya.kafkaworker.persistence.repositories.TaskEntityJpaRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +20,9 @@ import java.util.List;
 public class TaskUpdateService {
 
     private final TaskEntityJpaRepository taskRepository;
+
+    @Value("${application.retry.lag-ms:10000}")
+    private long retryLag;
 
     public boolean updateProgress(TaskRun task, int progress) {
         log.trace("Updating task №{} (eventId: {})", task.id(), task.executionId());
@@ -40,13 +44,18 @@ public class TaskUpdateService {
         if (progress < 0 || progress > 100) {
             throw new IllegalArgumentException("Progress must be in [0; 100]");
         }
+        Instant nextRetryAt = null;
+        if (status == TaskStatus.FAILED) {
+            nextRetryAt = Instant.now().plusMillis(retryLag);
+        }
         var response = taskRepository.finishExecution(
             task.id(),
             task.executionId(),
             status,
             progress,
             result,
-            Instant.now()
+            Instant.now(),
+            nextRetryAt
         ) == 1;
         if (response) {
             log.info("Finished task №{} (eventId: {}), status: {}", task.id(), task.executionId(), status);

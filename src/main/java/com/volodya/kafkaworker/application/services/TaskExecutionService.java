@@ -17,15 +17,15 @@ public class TaskExecutionService {
     private final TaskClaimService taskClaimService;
     private final TaskUpdateService taskUpdateService;
 
-    @Value("${application.task.update.delay:1000}")
-    private long updateDelay;
+    @Value("${application.task.update.delay-ms:1000}")
+    private long updateDelayMs;
 
     public void executeNextTask() {
         taskClaimService.claimNextTask().ifPresent(task -> {
             log.info("Executing message №{} (eventId: {})", task.id(), task.executionId());
             var elapsed = 0L;
             while (elapsed < task.duration()) {
-                var executionTime = Math.min(task.duration() - elapsed, updateDelay);
+                var executionTime = Math.min(task.duration() - elapsed, updateDelayMs);
                 try {
                     Thread.sleep(executionTime);
                 } catch (InterruptedException ex) {

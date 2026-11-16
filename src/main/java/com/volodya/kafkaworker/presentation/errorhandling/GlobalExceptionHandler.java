@@ -1,5 +1,6 @@
 package com.volodya.kafkaworker.presentation.errorhandling;
 
+import com.volodya.kafkaworker.application.exceptions.IllegalTaskStateException;
 import com.volodya.kafkaworker.application.exceptions.TaskNotFoundException;
 import com.volodya.kafkaworker.presentation.responses.ErrorResponse;
 import jakarta.validation.ConstraintViolationException;
@@ -45,6 +46,12 @@ public class GlobalExceptionHandler {
             .collect(Collectors.joining("; "));
         return ResponseEntity.badRequest()
             .body(new ErrorResponse("VALIDATION_ERROR", message));
+    }
+
+    @ExceptionHandler(IllegalTaskStateException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalTaskState(IllegalTaskStateException ex) {
+        return ResponseEntity.badRequest()
+            .body(new ErrorResponse("ILLEGAL_TASK_STATE", ex.getMessage()));
     }
 
     @ExceptionHandler({

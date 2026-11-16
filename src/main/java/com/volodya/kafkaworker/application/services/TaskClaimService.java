@@ -6,6 +6,7 @@ import com.volodya.kafkaworker.persistence.repositories.TaskEntityJpaRepository;
 import jakarta.persistence.OptimisticLockException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Recover;
@@ -25,6 +26,9 @@ public class TaskClaimService {
 
     private final TaskEntityJpaRepository taskRepository;
 
+    @Value("${application.claim-service.lease-buffer-seconds:5}")
+    private int leaseBufferSeconds;
+
     @Retryable(
         retryFor = {
             OptimisticLockingFailureException.class,
@@ -35,12 +39,14 @@ public class TaskClaimService {
     )
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public Optional<TaskRun> claimNextTask() {
-        return taskRepository.findByStatusOrderByCreatedAtAsc(TaskStatus.NEW)
+        return taskRepository.findFirstByStatusOrderByCreatedAtAsc(TaskStatus.NEW)
             .map(taskEntity -> {
                 taskEntity.setStatus(TaskStatus.IN_PROGRESS);
                 taskEntity.setExecutionId(UUID.randomUUID());
                 taskEntity.setStartedAt(Instant.now());
                 taskEntity.setProgress(0);
+                taskEntity.setAttempts(taskEntity.getAttempts() + 1);
+                taskEntity.setLeaseUntil(Instant.now().plusSeconds(taskEntity.getDuration() + leaseBufferSeconds));
                 taskRepository.saveAndFlush(taskEntity);
 
                 return new TaskRun(
