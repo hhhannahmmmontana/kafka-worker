@@ -34,14 +34,13 @@ public class TaskUpdateService {
         int progress,
         String result
     ) {
-        log.info("Finishing task №{} (eventId: {}), status: {}", task.id(), task.executionId(), status);
         if (!List.of(TaskStatus.COMPLETED, TaskStatus.FAILED).contains(status)) {
             throw new IllegalArgumentException("Finished task status expected");
         }
         if (progress < 0 || progress > 100) {
             throw new IllegalArgumentException("Progress must be in [0; 100]");
         }
-        return taskRepository.finishExecution(
+        var response = taskRepository.finishExecution(
             task.id(),
             task.executionId(),
             status,
@@ -49,5 +48,9 @@ public class TaskUpdateService {
             result,
             Instant.now()
         ) == 1;
+        if (response) {
+            log.info("Finished task №{} (eventId: {}), status: {}", task.id(), task.executionId(), status);
+        }
+        return response;
     }
 }

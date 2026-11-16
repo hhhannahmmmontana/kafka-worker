@@ -60,7 +60,6 @@ public class TaskExecutionService {
                 }
             }
 
-
             taskUpdateService.finishExecution(
                 task,
                 TaskStatus.COMPLETED,
