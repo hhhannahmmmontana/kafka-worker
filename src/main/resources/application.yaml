@@ -1,5 +1,6 @@
 spring:
   application.name: kafka-worker
+  kafka.consumer.group-id: task-worker
 
 application.kafka.error-handling:
   backoff-ms: 1000

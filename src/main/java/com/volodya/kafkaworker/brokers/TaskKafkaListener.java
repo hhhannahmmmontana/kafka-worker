@@ -23,7 +23,7 @@ public class TaskKafkaListener {
     private final Validator validator;
 
     @KafkaListener(
-        topics = "${kafka.topic}",
+        topics = "${kafka.topic:tasks}",
         containerFactory = "kafkaListenerContainerFactory"
     )
     public void receive(ConsumerRecord<UUID, TaskRequest> record) {

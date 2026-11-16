@@ -21,15 +21,15 @@ public class TaskScheduler {
     @Name("taskExecutorService")
     private final ExecutorService executorService;
     private final TaskExecutionService taskExecutionService;
-    private final LongAdder workersCounter;
+    private final LongAdder workersCounter = new LongAdder();
     private volatile boolean stopping = false;
 
     @Value("${application.worker.runners.maxAmount:4}")
     private int maxWorkersAmount;
 
-    @Scheduled(fixedDelayString = "${application.worker.poll-delay-ms:1000}")
+    @Scheduled(fixedDelayString = "${application.worker.poll-delay-ms:5000}")
     public void processTask() {
-        if (!stopping || executorService.isShutdown()) {
+        if (stopping || executorService.isShutdown()) {
             return;
         }
 

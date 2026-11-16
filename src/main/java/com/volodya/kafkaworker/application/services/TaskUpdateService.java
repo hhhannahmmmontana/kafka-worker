@@ -4,6 +4,7 @@ import com.volodya.kafkaworker.application.entites.TaskRun;
 import com.volodya.kafkaworker.persistence.entities.enums.TaskStatus;
 import com.volodya.kafkaworker.persistence.repositories.TaskEntityJpaRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,11 +15,13 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Transactional(propagation = Propagation.REQUIRES_NEW)
+@Slf4j
 public class TaskUpdateService {
 
     private final TaskEntityJpaRepository taskRepository;
 
     public boolean updateProgress(TaskRun task, int progress) {
+        log.trace("Updating task №{} (eventId: {})", task.id(), task.executionId());
         if (progress < 0 || progress > 99) {
             throw new IllegalArgumentException("Intermediate progress must be in [0; 99]");
         }
@@ -31,6 +34,7 @@ public class TaskUpdateService {
         int progress,
         String result
     ) {
+        log.info("Finishing task №{} (eventId: {}), status: {}", task.id(), task.executionId(), status);
         if (!List.of(TaskStatus.COMPLETED, TaskStatus.FAILED).contains(status)) {
             throw new IllegalArgumentException("Finished task status expected");
         }

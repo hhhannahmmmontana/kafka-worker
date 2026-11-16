@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.TransactionException;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -18,12 +17,12 @@ public class TaskExecutionService {
     private final TaskClaimService taskClaimService;
     private final TaskUpdateService taskUpdateService;
 
-    @Value("${application.task.update.delay}")
+    @Value("${application.task.update.delay:1000}")
     private long updateDelay;
 
-    @Transactional
     public void executeNextTask() {
         taskClaimService.claimNextTask().ifPresent(task -> {
+            log.info("Executing message №{} (eventId: {})", task.id(), task.executionId());
             var elapsed = 0L;
             while (elapsed < task.duration()) {
                 var executionTime = Math.min(task.duration() - elapsed, updateDelay);
@@ -36,6 +35,9 @@ public class TaskExecutionService {
                 }
 
                 elapsed += executionTime;
+                if (elapsed >= task.duration()) {
+                    break;
+                }
                 try {
                     if (!taskUpdateService.updateProgress(task, elapsedToProgress(task, elapsed))) {
                         log.warn(
@@ -58,6 +60,7 @@ public class TaskExecutionService {
                 }
             }
 
+
             taskUpdateService.finishExecution(
                 task,
                 TaskStatus.COMPLETED,
@@ -72,6 +75,6 @@ public class TaskExecutionService {
     }
 
     private int elapsedToProgress(TaskRun task, long elapsed) {
-        return (int) Math.max(elapsed * 100L / task.duration(), 100L);
+        return (int) Math.min(elapsed * 100L / task.duration(), 100L);
     }
 }

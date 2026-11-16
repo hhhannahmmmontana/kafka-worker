@@ -49,7 +49,7 @@ public interface TaskEntityJpaRepository extends JpaRepository<TaskEntity, Long>
 
     @Modifying(flushAutomatically = true, clearAutomatically = true)
     @Query("""
-        UPDATE Task t
+        UPDATE TaskEntity t
         SET t.status = :status,
             t.progress = :progress,
             t.result = :result,

@@ -39,7 +39,7 @@ public class KafkaConfig {
     @Value("${spring.kafka.consumer.group-id}")
     private String groupId;
 
-    @Value("${kafka.listener.concurrency:}")
+    @Value("${kafka.listener.concurrency:4}")
     private int concurrency;
 
     @Value("${application.kafka.error-handling.backoff-ms}")
